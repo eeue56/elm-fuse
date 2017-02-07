@@ -5,3 +5,5 @@ repl-temp-*
 
 _temp.js
 node_modules
+.uno
+build/
