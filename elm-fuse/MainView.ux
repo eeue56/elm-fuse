@@ -1,4 +1,10 @@
 <App>
-    <Button Color="#000" Height="200" Text="A black button" Width="500"></Button>
+    <StackPanel>
+            <Button Color="#000" Height="200" Text="A black button" Width="500"></Button>
+            <Button Color="#FF0" Height="100" Text="A small yellow button" Width="300"></Button>
+            <NativeViewHost>
+                    <WebView Url="https://google.com"></WebView>
+</NativeViewHost>
+</StackPanel>
     <Rectangle Color="#F00"></Rectangle>
 </App>

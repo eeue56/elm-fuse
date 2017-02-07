@@ -61,9 +61,25 @@ color =
         >> Attribute "Color"
 
 
+url : String -> Attribute
+url =
+    Xml.string
+        >> Attribute "Url"
+
+
 text : String -> Attribute
 text words =
     Attribute "Text" (Xml.string words)
+
+
+webview : List Attribute -> List FuseTag -> FuseTag
+webview =
+    node "WebView"
+
+
+nativeViewHost : List Attribute -> List FuseTag -> FuseTag
+nativeViewHost =
+    node "NativeViewHost"
 
 
 app : List FuseTag -> Program
