@@ -7,3 +7,4 @@ _temp.js
 node_modules
 .uno
 build/
+index.html

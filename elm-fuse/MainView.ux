@@ -1,0 +1,4 @@
+<App>
+    <Button Color="#000" Height="200" Text="A black button" Width="500"></Button>
+    <Rectangle Color="#F00"></Rectangle>
+</App>
