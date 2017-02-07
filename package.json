@@ -1,0 +1,29 @@
+{
+  "name": "elm-fuse",
+  "version": "1.0.0",
+  "description": "Elm to Fuse",
+  "main": "runner.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eeue56/elm-fuse.git"
+  },
+  "keywords": [
+    "elm",
+    "fuse"
+  ],
+  "author": "eeue56",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/eeue56/elm-fuse/issues"
+  },
+  "homepage": "https://github.com/eeue56/elm-fuse#readme",
+  "dependencies": {
+    "node-elm-compiler": "^4.3.0"
+  }
+}
