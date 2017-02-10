@@ -1,35 +1,10 @@
 port module Main exposing (..)
 
+import Model exposing (..)
+import Update exposing (..)
 import Fuse exposing (..)
 import Fuse.Layout exposing (..)
 import Fuse.Generator
-
-
-type alias Model =
-    { clicks : Int }
-
-
-type Msg
-    = YellowClicked
-    | BlackClicked
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        YellowClicked ->
-            let
-                _ =
-                    Debug.log "Small yellow button clicked! Incrementing model in Elm.." model.clicks
-            in
-                ( { model | clicks = model.clicks + 1 }, Cmd.none )
-
-        BlackClicked ->
-            let
-                _ =
-                    Debug.log "Big black button clicked! Decrement model in Elm.." model.clicks
-            in
-                ( { model | clicks = model.clicks - 1 }, Cmd.none )
 
 
 main : Platform.Program Never Model Msg

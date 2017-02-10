@@ -15,12 +15,13 @@ port sendUxl : String -> Cmd msg
 port modelUpdated : ( Json.Value, Json.Value ) -> Cmd msg
 
 
-
-
 port events : (Json.Value -> msg) -> Sub msg
 
 
+
 -- TODO: collect subs other than buttons
+
+
 collectSubs : Fuse.Program msg model -> List String
 collectSubs (Fuse.Program tags special) =
     List.map (Xml.Query.tags "Button") tags
@@ -57,20 +58,24 @@ collectSends (Fuse.Program tags special) =
             )
 
 
+
 -- TODO: refactor this to infinity
+-- TODO: collect subs other than buttons
+
+
 run : (msg -> model -> ( model, Cmd msg )) -> model -> Fuse.Program msg model -> Program Never model msg
 run update model ((Fuse.Program tags special) as program) =
     Platform.program
         { init =
             ( model
             , Cmd.batch
-                [ sendUxl <| Fuse.programToUXL program (collectSends program) (collectSubs program), Json.list <| List.map FFI.asIs special )
+                [ sendUxl <| Fuse.programToUXL program (collectSends program) (collectSubs program)
+                , modelUpdated <| ( FFI.asIs model, Json.list <| List.map FFI.asIs special )
                 ]
             )
-        , update 
-            (\msg
-             model ->
-            -- TODO: collect subs other than buttons    let
+        , update =
+            (\msg model ->
+                let
                     ( newModel, newCmds ) =
                         update msg model
                 in
