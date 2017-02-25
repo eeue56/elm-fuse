@@ -47,3 +47,9 @@ text words =
 onClick : msg -> Attribute msg model
 onClick msg =
     Attribute "Clicked" (Xml.string <| "{" ++ (toString msg) ++ "}")
+
+
+bool : Bool -> Attribute msg model
+bool =
+    Xml.bool
+        >> Attribute "Bool"

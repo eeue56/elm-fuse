@@ -30,7 +30,7 @@ main =
                 ]
                 []
             , button
-                [ reflect text (\model -> "You have a total score of " ++ (toString model.clicks) ++ "!")
+                [ reflectString text (\model -> "You have a total score of " ++ (toString model.clicks) ++ "!")
                 , width 400
                 , height 200
                 , color "#FFF"

@@ -5,6 +5,7 @@ module Fuse exposing (..)
 import Xml.Encode as Xml exposing (Value(Tag))
 import Xml.Query
 import Json.Encode as Json
+import Json.Decode
 import Dict exposing (Dict)
 import FFI
 
@@ -15,7 +16,7 @@ type alias FuseTag =
 
 type Attribute msg model
     = Attribute String Xml.Value
-    | StringReflector (String -> Attribute msg model) (model -> String)
+    | Reflector (Json.Value -> Attribute msg model) (model -> Json.Value)
 
 
 type Program msg model
@@ -36,7 +37,7 @@ attributeToTuple attribute =
         Attribute name value ->
             ( name, value )
 
-        StringReflector makeAttr accessor ->
+        Reflector makeAttr accessor ->
             ( "-Special", FFI.intoElm <| FFI.asIs attribute )
 
 
@@ -111,10 +112,10 @@ app tags =
                             Attribute _ _ ->
                                 Nothing
 
-                            StringReflector makeAttr accessor ->
+                            Reflector makeAttr accessor ->
                                 let
                                     name =
-                                        makeAttr ""
+                                        makeAttr (Json.string "")
                                             |> (\a ->
                                                     case a of
                                                         Attribute nameA _ ->
@@ -139,10 +140,10 @@ app tags =
                                     Attribute name thing ->
                                         Dict.insert name thing dictA
 
-                                    StringReflector makeAttr accessor ->
+                                    Reflector makeAttr accessor ->
                                         let
                                             name =
-                                                makeAttr ""
+                                                makeAttr (Json.string "")
                                                     |> (\a ->
                                                             case a of
                                                                 Attribute nameA _ ->
@@ -246,9 +247,14 @@ sendNameToJS name =
     """ var """ ++ name ++ """ = new Observable();"""
 
 
-reflect : (String -> Attribute msg model) -> (model -> String) -> Attribute msg model
+reflect : (Json.Value -> Attribute msg model) -> (model -> Json.Value) -> Attribute msg model
 reflect attributeMake view =
-    StringReflector attributeMake view
+    Reflector attributeMake view
+
+
+reflectString : (String -> Attribute msg model) -> (model -> String) -> Attribute msg model
+reflectString attributeMake view =
+    reflect (FFI.intoElm >> attributeMake) (view >> Json.string)
 
 
 
