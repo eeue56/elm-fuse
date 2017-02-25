@@ -3,6 +3,7 @@ port module Main exposing (..)
 import Model exposing (..)
 import Update exposing (..)
 import Fuse exposing (..)
+import Fuse.Attributes exposing (..)
 import Fuse.Layout exposing (..)
 import Fuse.Generator
 

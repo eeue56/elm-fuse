@@ -26,11 +26,6 @@ type Observable
     = Observable
 
 
-attribute : String -> Xml.Value -> Attribute msg model
-attribute name value =
-    Attribute name value
-
-
 
 -- TODO: make typesafe
 
@@ -65,46 +60,6 @@ button =
 rectangle : List (Attribute msg model) -> List FuseTag -> FuseTag
 rectangle =
     node "Rectangle"
-
-
-height : Int -> Attribute msg model
-height =
-    Xml.int
-        >> Attribute "Height"
-
-
-width : Int -> Attribute msg model
-width =
-    Xml.int
-        >> Attribute "Width"
-
-
-fontSize : Int -> Attribute msg model
-fontSize =
-    Xml.int
-        >> Attribute "FontSize"
-
-
-color : String -> Attribute msg model
-color =
-    Xml.string
-        >> Attribute "Color"
-
-
-url : String -> Attribute msg model
-url =
-    Xml.string
-        >> Attribute "Url"
-
-
-text : String -> Attribute msg model
-text words =
-    Attribute "Text" (Xml.string words)
-
-
-onClick : msg -> Attribute msg model
-onClick msg =
-    Attribute "Clicked" (Xml.string <| "{" ++ (toString msg) ++ "}")
 
 
 webview : List (Attribute msg model) -> List FuseTag -> FuseTag
@@ -297,7 +252,7 @@ reflect attributeMake view =
 
 
 
--- TODO: this only works if functions arent' the same length
+-- TODO: this only works if functions aren't the same length
 
 
 functionToString : (a -> b) -> String
