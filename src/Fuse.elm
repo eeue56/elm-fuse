@@ -39,7 +39,11 @@ attributeToTuple attribute =
             ( name, value )
 
         Reflector makeAttr accessor ->
-            ( "-Special", FFI.intoElm <| FFI.asIs attribute )
+            let
+                name =
+                    getAttributeName makeAttr
+            in
+                ( "-Special-" ++ name, FFI.intoElm <| FFI.asIs attribute )
 
 
 attributesToDict : List (Attribute msg model) -> Dict String Xml.Value
@@ -79,91 +83,77 @@ javaScript content =
     node "JavaScript" [] [ Xml.string content ]
 
 
-
--- TODO: this function is probably one of the worst I've ever written
--- It's magic, not typesafe, and in dire need of refactoring ASAP.
-
-
 collectSpecialValues : Xml.Value -> List (Attribute msg model) -> List (Attribute msg model)
 collectSpecialValues tag xs =
     case tag of
         Tag name dict _ ->
-            case Dict.get "-Special" dict of
-                Just attr ->
-                    FFI.asIs attr
-                        |> FFI.intoElm
-                        |> (\x -> xs ++ [ x ])
-
-                Nothing ->
-                    xs
+            Dict.toList dict
+                |> List.filter (\( name, value ) -> String.startsWith "-Special" name)
+                |> List.map (Tuple.second >> FFI.asIs >> FFI.intoElm)
+                |> (++) xs
 
         _ ->
             xs
 
 
-app : List FuseTag -> Program msg model
-app tags =
+getAttributeName : (Json.Value -> Attribute msg model) -> String
+getAttributeName makeAttr =
+    case makeAttr (Json.string "") of
+        Attribute name _ ->
+            name
+
+        _ ->
+            ""
+
+
+collectReflectors : List FuseTag -> List (Attribute msg model)
+collectReflectors tags =
+    tags
+        |> Xml.Object
+        |> Xml.foldl (collectSpecialValues) []
+        |> List.filterMap
+            (\thing ->
+                case thing of
+                    Attribute _ _ ->
+                        Nothing
+
+                    Reflector makeAttr accessor ->
+                        Attribute (functionToString accessor) (FFI.intoElm <| FFI.asIs accessor)
+                            |> Just
+            )
+
+
+replaceSpecial : String -> Dict String Xml.Value -> Xml.Value -> FuseTag
+replaceSpecial name dict tags =
     let
-        special : List (Attribute msg model)
-        special =
-            tags
-                |> Xml.Object
-                |> Xml.foldl (collectSpecialValues) []
-                |> List.filterMap
-                    (\thing ->
-                        case thing of
-                            Attribute _ _ ->
-                                Nothing
+        newDict =
+            Dict.foldl
+                (\name value dictA ->
+                    if String.startsWith "-Special" name then
+                        case FFI.asIs value |> FFI.intoElm of
+                            Attribute name thing ->
+                                Dict.insert name thing dictA
 
                             Reflector makeAttr accessor ->
                                 let
-                                    name =
-                                        makeAttr (Json.string "")
-                                            |> (\a ->
-                                                    case a of
-                                                        Attribute nameA _ ->
-                                                            nameA
-
-                                                        _ ->
-                                                            ""
-                                               )
+                                    attrName =
+                                        String.dropLeft (String.length "-Special" + 1) name
                                 in
-                                    Attribute (functionToString accessor) (FFI.intoElm <| FFI.asIs accessor)
-                                        |> Just
-                    )
+                                    Dict.insert attrName (Xml.string <| ("{" ++ functionToString accessor ++ "}")) dictA
+                    else
+                        Dict.insert name value dictA
+                )
+                Dict.empty
+                dict
+    in
+        (Xml.Tag name newDict tags)
 
-        replaceSpecial : String -> Dict String Xml.Value -> Xml.Value -> FuseTag
-        replaceSpecial name dict tags =
-            let
-                newDict =
-                    Dict.foldl
-                        (\name value dictA ->
-                            if name == "-Special" then
-                                case FFI.asIs value |> FFI.intoElm of
-                                    Attribute name thing ->
-                                        Dict.insert name thing dictA
 
-                                    Reflector makeAttr accessor ->
-                                        let
-                                            name =
-                                                makeAttr (Json.string "")
-                                                    |> (\a ->
-                                                            case a of
-                                                                Attribute nameA _ ->
-                                                                    nameA
-
-                                                                _ ->
-                                                                    ""
-                                                       )
-                                        in
-                                            Dict.insert name (Xml.string <| ("{" ++ functionToString accessor ++ "}")) dictA
-                            else
-                                Dict.insert name value dictA
-                        )
-                        Dict.empty
-                        dict
-            in
-                (Xml.Tag name newDict tags)
+app : List FuseTag -> Program msg model
+app tags =
+    let
+        special =
+            collectReflectors tags
 
         newTags =
             List.map (mapTags replaceSpecial) tags

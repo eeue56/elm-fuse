@@ -4,6 +4,7 @@ import Model exposing (..)
 import Update exposing (..)
 import Fuse exposing (..)
 import Fuse.Attributes exposing (..)
+import Fuse.Events exposing (..)
 import Fuse.Layout exposing (..)
 import Fuse.Generator
 import Fuse.Conditions exposing (viewIf)
