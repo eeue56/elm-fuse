@@ -5,6 +5,7 @@ var Observable = require("FuseJS/Observable");
 var Elm = require('./elm.js');
 var elm = Elm.Main.worker();
      var func84 = new Observable();
+ var func95 = new Observable();
  function BlackClicked(){
     elm.ports.events.send({ctor: 'BlackClicked'});
 }
@@ -23,12 +24,21 @@ elm.ports.modelUpdated.subscribe(function(things){
         module.exports[name].value = func(model);
     });
 });
-module.exports = {BlackClicked:BlackClicked,YellowClicked:YellowClicked,func84:func84}
+module.exports = {BlackClicked:BlackClicked,YellowClicked:YellowClicked,func84:func84,func95:func95}
 </JavaScript>
     <StackPanel>
             <Button Clicked="{BlackClicked}" Color="#000" Height="200" Text="Click to decrement" Width="500"></Button>
             <Button Clicked="{YellowClicked}" Color="#FF0" Height="100" Text="Click to increment" Width="300"></Button>
             <Button Color="#FFF" Height="200" Text="{func84}" Width="400"></Button>
+            <Button Color="#000" Height="50"></Button>
+            <Match Value="{func95}">
+                    <Case Bool="true">
+                            <Button Color="#FFF" Height="200" Text="You've got 5 or more things!" Width="400"></Button>
+</Case>
+                    <Case Bool="false">
+                            <Button></Button>
+</Case>
+</Match>
 </StackPanel>
-    <Rectangle Color="#F00"></Rectangle>
+    <Rectangle Color="#00A"></Rectangle>
 </App>
