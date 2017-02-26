@@ -2,7 +2,8 @@ module Fuse exposing (..)
 
 -- TODO: split this function up in attributes, tags, and magic
 
-import Xml.Encode as Xml exposing (Value(Tag))
+import Xml exposing (Value(Tag))
+import Xml.Encode as Xml
 import Xml.Query
 import Json.Encode as Json
 import Json.Decode
@@ -83,29 +84,31 @@ javaScript content =
 -- It's magic, not typesafe, and in dire need of refactoring ASAP.
 
 
+collectSpecialValues : Xml.Value -> List (Attribute msg model) -> List (Attribute msg model)
+collectSpecialValues tag xs =
+    case tag of
+        Tag name dict _ ->
+            case Dict.get "-Special" dict of
+                Just attr ->
+                    FFI.asIs attr
+                        |> FFI.intoElm
+                        |> (\x -> xs ++ [ x ])
+
+                Nothing ->
+                    xs
+
+        _ ->
+            xs
+
+
 app : List FuseTag -> Program msg model
 app tags =
     let
         special : List (Attribute msg model)
         special =
-            List.map (Xml.Query.tags "Button") tags
-                |> List.concat
-                |> List.filterMap
-                    (\tag ->
-                        case tag of
-                            Tag name dict _ ->
-                                case Dict.get "-Special" dict of
-                                    Just attr ->
-                                        FFI.asIs attr
-                                            |> FFI.intoElm
-                                            |> Just
-
-                                    Nothing ->
-                                        Nothing
-
-                            _ ->
-                                Nothing
-                    )
+            tags
+                |> Xml.Object
+                |> Xml.foldl (collectSpecialValues) []
                 |> List.filterMap
                     (\thing ->
                         case thing of

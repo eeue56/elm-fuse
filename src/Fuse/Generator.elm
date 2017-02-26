@@ -2,7 +2,7 @@ port module Fuse.Generator exposing (..)
 
 import Platform
 import Dict
-import Xml.Encode exposing (Value(Tag))
+import Xml exposing (Value(Tag))
 import Xml.Query
 import FFI
 import Fuse
@@ -18,29 +18,34 @@ port modelUpdated : ( Json.Value, Json.Value ) -> Cmd msg
 port events : (Json.Value -> msg) -> Sub msg
 
 
+collectSubName : Xml.Value -> List String -> List String
+collectSubName tag xs =
+    case tag of
+        Tag name dict nextValue ->
+            Dict.toList dict
+                |> List.filterMap
+                    (\( name, value ) ->
+                        case Xml.Query.string value of
+                            Err _ ->
+                                Nothing
 
--- TODO: collect subs other than buttons
+                            Ok v ->
+                                if String.startsWith "{" v && String.endsWith "}" v && name == "Clicked" then
+                                    Just v
+                                else
+                                    Nothing
+                    )
+                |> (\stuff -> xs ++ stuff)
+
+        _ ->
+            xs
 
 
 collectSubs : Fuse.Program msg model -> List String
 collectSubs (Fuse.Program tags special) =
-    List.map (Xml.Query.tags "Button") tags
-        |> List.concat
-        |> List.filterMap
-            (\tag ->
-                case tag of
-                    Tag name dict _ ->
-                        case Dict.get "Clicked" dict of
-                            Just name ->
-                                Xml.Query.string name
-                                    |> Result.toMaybe
-
-                            Nothing ->
-                                Nothing
-
-                    _ ->
-                        Nothing
-            )
+    tags
+        |> Xml.Object
+        |> Xml.foldl (collectSubName) []
         |> List.map (String.dropLeft 1 >> String.dropRight 1)
 
 

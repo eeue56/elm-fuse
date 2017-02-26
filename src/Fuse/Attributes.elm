@@ -1,5 +1,7 @@
 module Fuse.Attributes exposing (..)
 
+import Json.Encode as Json
+import Xml
 import Xml.Encode as Xml
 import Fuse exposing (..)
 
@@ -53,3 +55,8 @@ bool : Bool -> Attribute msg model
 bool =
     Xml.bool
         >> Attribute "Bool"
+
+
+value : Xml.Value -> Attribute msg model
+value =
+    Attribute "Value"

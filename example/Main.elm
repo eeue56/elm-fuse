@@ -6,6 +6,7 @@ import Fuse exposing (..)
 import Fuse.Attributes exposing (..)
 import Fuse.Layout exposing (..)
 import Fuse.Generator
+import Fuse.Conditions exposing (viewIf)
 
 
 main : Platform.Program Never Model Msg
@@ -36,9 +37,27 @@ main =
                 , color "#FFF"
                 ]
                 []
+            , button
+                [ height 50
+                , color "#000"
+                ]
+                []
+            , viewIf (\model -> model.clicks >= 5)
+                (button
+                    [ text "You've got 5 or more things!"
+                    , width 400
+                    , height 200
+                    , color "#FFF"
+                    ]
+                    []
+                )
+                (button
+                    []
+                    []
+                )
             ]
         , rectangle
-            [ color "#F00" ]
+            [ color "#00A" ]
             []
         ]
         |> Fuse.Generator.run update { clicks = 0 }
