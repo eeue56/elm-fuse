@@ -15,43 +15,27 @@ port sendUxl : String -> Cmd msg
 port modelUpdated : ( Json.Value, Json.Value ) -> Cmd msg
 
 
-port events : (Json.Value -> msg) -> Sub msg
+port eventsPort : (Json.Value -> msg) -> Sub msg
 
 
-collectSubName : Xml.Value -> List String -> List String
-collectSubName tag xs =
-    case tag of
-        Tag name dict nextValue ->
-            Dict.toList dict
-                |> List.filterMap
-                    (\( name, value ) ->
-                        case Xml.Query.string value of
-                            Err _ ->
-                                Nothing
+collectSubs : Fuse.Program msg model -> List ( String, msg, Int )
+collectSubs (Fuse.Program tags observables events) =
+    events
+        |> List.filterMap
+            (\thing ->
+                case thing of
+                    Fuse.EventAttribute name value numberOfArgs ->
+                        Just ( name, FFI.intoElm <| FFI.asIs value, numberOfArgs )
 
-                            Ok v ->
-                                if String.startsWith "{" v && String.endsWith "}" v && name == "Clicked" then
-                                    Just v
-                                else
-                                    Nothing
-                    )
-                |> (\stuff -> xs ++ stuff)
-
-        _ ->
-            xs
-
-
-collectSubs : Fuse.Program msg model -> List String
-collectSubs (Fuse.Program tags special) =
-    tags
-        |> Xml.Object
-        |> Xml.foldl (collectSubName) []
-        |> List.map (String.dropLeft 1 >> String.dropRight 1)
+                    _ ->
+                        Nothing
+            )
+        |> Debug.log "events"
 
 
 collectSends : Fuse.Program msg model -> List String
-collectSends (Fuse.Program tags special) =
-    special
+collectSends (Fuse.Program tags observables events) =
+    observables
         |> List.filterMap
             (\thing ->
                 case thing of
@@ -69,13 +53,13 @@ collectSends (Fuse.Program tags special) =
 
 
 run : (msg -> model -> ( model, Cmd msg )) -> model -> Fuse.Program msg model -> Program Never model msg
-run update model ((Fuse.Program tags special) as program) =
+run update model ((Fuse.Program tags observables events) as program) =
     Platform.program
         { init =
             ( model
             , Cmd.batch
                 [ sendUxl <| Fuse.programToUXL program (collectSends program) (collectSubs program)
-                , modelUpdated <| ( FFI.asIs model, Json.list <| List.map FFI.asIs special )
+                , modelUpdated <| ( FFI.asIs model, Json.list <| List.map FFI.asIs observables )
                 ]
             )
         , update =
@@ -84,10 +68,10 @@ run update model ((Fuse.Program tags special) as program) =
                     ( newModel, newCmds ) =
                         update msg model
                 in
-                    ( newModel, Cmd.batch [ modelUpdated <| ( FFI.asIs newModel, Json.list <| List.map FFI.asIs special ), newCmds ] )
+                    ( newModel, Cmd.batch [ modelUpdated <| ( FFI.asIs newModel, Json.list <| List.map FFI.asIs observables ), newCmds ] )
             )
         , subscriptions =
             (\model ->
-                events FFI.intoElm
+                eventsPort FFI.intoElm
             )
         }

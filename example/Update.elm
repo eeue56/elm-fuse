@@ -6,6 +6,7 @@ import Model exposing (..)
 type Msg
     = YellowClicked
     | BlackClicked
+    | TextChanged String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -24,3 +25,6 @@ update msg model =
                     Debug.log "Big black button clicked! Decrement model in Elm.." model.clicks
             in
                 ( { model | clicks = model.clicks - 1 }, Cmd.none )
+
+        TextChanged text ->
+            ( { model | text = text }, Cmd.none )

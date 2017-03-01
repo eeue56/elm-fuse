@@ -8,6 +8,7 @@ import Fuse.Events exposing (..)
 import Fuse.Layout exposing (..)
 import Fuse.Generator
 import Fuse.Conditions exposing (viewIf)
+import Fuse.Controls exposing (textInput)
 
 
 main : Platform.Program Never Model Msg
@@ -31,9 +32,22 @@ main =
                 , onClick YellowClicked
                 ]
                 []
+            , textInput
+                [ stringValueChanged (TextChanged)
+                , width 300
+                , height 200
+                ]
+                []
             , button
-                [ reflectString text (\model -> "You have a total score of " ++ (toString model.clicks) ++ "!")
-                , width 400
+                [ width 300
+                , height 200
+                , color "#FFA"
+                , reflectString text (\model -> "You typed: " ++ model.text)
+                ]
+                []
+            , button
+                [ --reflectString text (\model -> "You have a total score of " ++ (toString model.clicks) ++ "!" ++ " and you typed " ++ model.text)
+                  width 400
                 , height 200
                 , color "#FFF"
                 ]
@@ -52,13 +66,10 @@ main =
                     ]
                     []
                 )
-                (button
-                    []
-                    []
-                )
+                (button [] [])
             ]
         , rectangle
-            [ color "#00A" ]
+            [ color "#FFF" ]
             []
         ]
-        |> Fuse.Generator.run update { clicks = 0 }
+        |> Fuse.Generator.run update { clicks = 0, text = "" }

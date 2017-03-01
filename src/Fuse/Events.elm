@@ -1,11 +1,19 @@
 module Fuse.Events exposing (..)
 
-import Json.Encode as Json
-import Xml
-import Xml.Encode as Xml
 import Fuse exposing (..)
+import FFI
 
 
 onClick : msg -> Attribute msg model
 onClick msg =
-    Attribute "Clicked" (Xml.string <| "{" ++ (toString msg) ++ "}")
+    EventAttribute "Clicked" msg 0
+
+
+stringValueChanged : (String -> msg) -> Attribute msg model
+stringValueChanged msg =
+    EventAttribute "ValueChanged" (constructorToMsg msg) 1
+
+
+constructorToMsg : (a -> msg) -> msg
+constructorToMsg =
+    FFI.asIs >> FFI.intoElm

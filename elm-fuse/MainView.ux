@@ -6,14 +6,17 @@ var Elm = require('./elm.js');
 var elm = Elm.Main.worker();
      var func86 = new Observable();
  var func95 = new Observable();
- function BlackClicked(){
-    elm.ports.events.send({ctor: 'BlackClicked'});
-}
-    
- function YellowClicked(){
-    elm.ports.events.send({ctor: 'YellowClicked'});
-}
-    
+ function event0_0(){
+        elm.ports.eventsPort.send(({"ctor":"BlackClicked"})  );
+        }
+ function event1_0(){
+        elm.ports.eventsPort.send(({"ctor":"YellowClicked"})  );
+        }
+ function event2_1(_0){
+        elm.ports.eventsPort.send((function (a) {
+	return {ctor: 'TextChanged', _0: a};
+})(_0.value)  );
+        }
 elm.ports.modelUpdated.subscribe(function(things){
     var model = things[0];
     var nameToFn = things[1];
@@ -24,12 +27,14 @@ elm.ports.modelUpdated.subscribe(function(things){
         module.exports[name].value = func(model);
     });
 });
-module.exports = {BlackClicked:BlackClicked,YellowClicked:YellowClicked,func86:func86,func95:func95}
+module.exports = {event0_0:event0_0,event1_0:event1_0,event2_1:event2_1,func86:func86,func95:func95}
 </JavaScript>
     <StackPanel>
-            <Button Clicked="{BlackClicked}" Color="#000" Height="200" Text="Click to decrement" Width="500"></Button>
-            <Button Clicked="{YellowClicked}" Color="#FF0" Height="100" Text="Click to increment" Width="300"></Button>
-            <Button Color="#FFF" Height="200" Text="{func86}" Width="400"></Button>
+            <Button Clicked="{event0_0}" Color="#000" Height="200" Text="Click to decrement" Width="500"></Button>
+            <Button Clicked="{event1_0}" Color="#FF0" Height="100" Text="Click to increment" Width="300"></Button>
+            <TextInput Height="200" ValueChanged="{event2_1}" Width="300"></TextInput>
+            <Button Color="#FFA" Height="200" Text="{func86}" Width="300"></Button>
+            <Button Color="#FFF" Height="200" Width="400"></Button>
             <Button Color="#000" Height="50"></Button>
             <Match Value="{func95}">
                     <Case Bool="true">
@@ -40,5 +45,5 @@ module.exports = {BlackClicked:BlackClicked,YellowClicked:YellowClicked,func86:f
 </Case>
 </Match>
 </StackPanel>
-    <Rectangle Color="#00A"></Rectangle>
+    <Rectangle Color="#FFF"></Rectangle>
 </App>

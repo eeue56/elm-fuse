@@ -2,4 +2,6 @@ module Model exposing (..)
 
 
 type alias Model =
-    { clicks : Int }
+    { clicks : Int
+    , text : String
+    }
