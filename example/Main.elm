@@ -17,7 +17,7 @@ main =
         [ stackPanel
             []
             [ button
-                [ text "Click to decrement"
+                [ text "MAKE IT GO DOWNEST"
                 , width 500
                 , height 200
                 , color "#000"

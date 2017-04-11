@@ -18,6 +18,9 @@ port modelUpdated : ( Json.Value, Json.Value ) -> Cmd msg
 port eventsPort : (Json.Value -> msg) -> Sub msg
 
 
+port requestSendUxl : (() -> msg) -> Sub msg
+
+
 collectSubs : Fuse.Program msg model -> List ( String, msg, Int )
 collectSubs (Fuse.Program tags observables events) =
     events
@@ -71,7 +74,8 @@ run update model ((Fuse.Program tags observables events) as program) =
                     ( newModel, Cmd.batch [ modelUpdated <| ( FFI.asIs newModel, Json.list <| List.map FFI.asIs observables ), newCmds ] )
             )
         , subscriptions =
-            (\model ->
+            ( \model ->
                 eventsPort FFI.intoElm
+            , requestSendUxl <| always
             )
         }
