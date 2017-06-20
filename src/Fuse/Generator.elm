@@ -52,13 +52,18 @@ collectSends (Fuse.Program tags observables events) =
 -- TODO: collect subs other than buttons
 
 
-run : (msg -> model -> ( model, Cmd msg )) -> model -> Fuse.Program msg model -> Program Never model msg
-run update model ((Fuse.Program tags observables events) as program) =
+run : (msg -> model -> ( model, Cmd msg )) 
+    -> model 
+    -> (model -> Sub msg) 
+    -> String
+    -> Fuse.Program msg model 
+    -> Program Never model msg
+run update model subs portText ((Fuse.Program tags observables events) as program) =
     Platform.program
         { init =
             ( model
             , Cmd.batch
-                [ sendUxl <| Fuse.programToUXL program (collectSends program) (collectSubs program)
+                [ sendUxl <| Fuse.programToUXL program (collectSends program) (collectSubs program) portText
                 , modelUpdated <| ( FFI.asIs model, Json.list <| List.map FFI.asIs observables )
                 ]
             )
@@ -72,6 +77,9 @@ run update model ((Fuse.Program tags observables events) as program) =
             )
         , subscriptions =
             (\model ->
-                eventsPort FFI.intoElm
+                Sub.batch 
+                    [ eventsPort FFI.intoElm
+                    , subs model
+                    ]
             )
         }

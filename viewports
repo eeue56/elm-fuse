@@ -1,0 +1,10 @@
+ pause
+ [Viewport 1000, -550, -550, 1]
+[Viewport 500, -50, -50, 2]
+ [Viewport 500, 500, 0, 0.5]
+[Viewport 500, 0, 0, 0.5]
+
+[Viewport 500, 0, 0, 1]
+[Viewport 1000, 0, 0, 0.5]
+[Viewport 1000, 0, 0, 1]
+ [Viewport 1000, 0, 0, 2]

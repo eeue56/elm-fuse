@@ -91,6 +91,10 @@ javaScript : String -> FuseTag
 javaScript content =
     node "JavaScript" [] [ Xml.string content ]
 
+namedJavaScript : String -> String -> FuseTag
+namedJavaScript name content =
+    node "JavaScript" [ Attribute "Name" <| Xml.string name ] [ Xml.string content ]
+
 
 collectObservableValues : Xml.Value -> List (Attribute msg model) -> ObservableUX msg model
 collectObservableValues tag xs =
@@ -297,9 +301,9 @@ mapTags fn tag =
             anything
 
 
-programToUXL : Program msg model -> List String -> List ( String, msg, Int ) -> String
-programToUXL (Program tags observables events) sendNames subNames =
-    [ ( "App", Dict.empty, Xml.list ((javaScript (makeElmBindings sendNames subNames)) :: tags) ) ]
+programToUXL : Program msg model -> List String -> List ( String, msg, Int ) -> String -> String
+programToUXL (Program tags observables events) sendNames subNames portText =
+    [ ( "App", Dict.empty, Xml.list ((javaScript (makeElmBindings sendNames subNames ++ portText)) :: tags) ) ]
         |> Xml.object
         |> Xml.encode 4
 
@@ -321,8 +325,9 @@ exports sendNames subs =
             List.map (\( x, _, _ ) -> x) subs
 
         exportNames =
-            (subNames ++ sendNames)
+            ("elm" :: subNames ++ sendNames)
                 |> List.map (\name -> name ++ ":" ++ name)
+
                 |> String.join ","
     in
         "module.exports = {" ++ exportNames ++ "}"

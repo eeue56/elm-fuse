@@ -2,4 +2,5 @@
 
 node runner.js
 cd elm-fuse
-uno build --target native --run
+uno build --target dotnet
+uno build --target android --run

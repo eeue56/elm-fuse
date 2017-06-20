@@ -8,6 +8,11 @@ element =
     Fuse.node "Element"
 
 
+panel : List (Attribute msg model) -> List FuseTag -> FuseTag
+panel =
+    Fuse.node "Panel"
+
+
 stackPanel : List (Attribute msg model) -> List FuseTag -> FuseTag
 stackPanel =
     Fuse.node "StackPanel"
@@ -41,3 +46,12 @@ circleLayout =
 scrollView : List (Attribute msg model) -> List FuseTag -> FuseTag
 scrollView =
     Fuse.node "ScrollView"
+
+viewport : List (Attribute msg model) -> List FuseTag -> FuseTag
+viewport =
+    Fuse.node "Viewport"
+
+
+move : List (Attribute msg model) -> List FuseTag -> FuseTag
+move =
+    Fuse.node "Move"
