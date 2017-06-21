@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/eeue56/elm-fuse#readme",
   "dependencies": {
-    "node-elm-compiler": "^4.3.0"
+    "node-elm-compiler": "^4.3.0",
+    "node-watch": "^0.5.2"
   }
 }

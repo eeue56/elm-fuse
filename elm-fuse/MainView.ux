@@ -30,7 +30,7 @@ elm.ports.modelUpdated.subscribe(function(things){
 module.exports = {event0_0:event0_0,event1_0:event1_0,event2_1:event2_1,func86:func86,func95:func95}
 </JavaScript>
     <StackPanel>
-            <Button Clicked="{event0_0}" Color="#000" Height="200" Text="Click to decrement" Width="500"></Button>
+            <Button Clicked="{event0_0}" Color="#000" Height="200" Text="MAKE IT GO DOWNER" Width="500"></Button>
             <Button Clicked="{event1_0}" Color="#FF0" Height="100" Text="Click to increment" Width="300"></Button>
             <TextInput Height="200" ValueChanged="{event2_1}" Width="300"></TextInput>
             <Button Color="#FFA" Height="200" Text="{func86}" Width="300"></Button>
