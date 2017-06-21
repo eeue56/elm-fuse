@@ -4,28 +4,36 @@
 var Observable = require("FuseJS/Observable");
 var Elm = require('./elm.js');
 var elm = Elm.Main.worker();
-     var func335 = new Observable();
- var func130 = new Observable();
- var func101 = new Observable();
+     var func3351 = new Observable();
+ var func1301 = new Observable();
+ var func3831 = new Observable();
+ var func3821 = new Observable();
  function event0_0(){
         elm.ports.eventsPort.send(({"ctor":"StartMoving"})  );
         }
- function event1_1(_0){
-        elm.ports.eventsPort.send((function (a) {
-	return {ctor: 'TextChanged', _0: a};
-})(_0.value)  );
-        }
+
+var lastModel = null;
 elm.ports.modelUpdated.subscribe(function(things){
     var model = things[0];
     var nameToFn = things[1];
 
+    if (model === lastModel) return;
+    lastModel = model;
+
     nameToFn.map(function(thing){
         var name = thing._0;
         var func = thing._1;
-        module.exports[name].value = func(model);
+        var newValue = func(model);
+
+        if (typeof newValue === "object" && Object.keys(newValue).indexOf('_items') > -1){
+            module.exports[name].clear();
+            module.exports[name].addAll(newValue['_items']);
+        } else {
+            module.exports[name].value = newValue;
+        }
     });
 });
-module.exports = {elm:elm,event0_0:event0_0,event1_1:event1_1,func335:func335,func130:func130,func101:func101}
+module.exports = {elm:elm,event0_0:event0_0,func3351:func3351,func1301:func1301,func3831:func3831,func3821:func3821}
 
 var Timer = require("FuseJS/Timer");
 
@@ -38,11 +46,10 @@ Timer.create(function() {
 }, 16, true);
 
 
-var socket = new WebSocket('ws://0046ffee.ngrok.io');
+var socket = new WebSocket('ws://cca26b37.ngrok.io');
 
 try {
     socket.addEventListener('message', function (event) {
-        console.log('Message from server', event.data);
         elm.ports.listen.send(event.data);
     });
 } catch (e) {
@@ -52,15 +59,12 @@ try {
 
 </JavaScript>
     <Panel Clicked="{event0_0}" TransformOrigin="TopLeft">
-            <InteractiveTransform Translation="{func335}" ZoomFactor="{func130}"></InteractiveTransform>
-            <Rectangle Color="#F00" Height="200" Width="300" X="-500">
-                    <TextInput Height="200" ValueChanged="{event1_1}" Width="300"></TextInput>
-</Rectangle>
-            <Text FontSize="42" Value="{func101}" X="600" Y="600"></Text>
-            <Rectangle Color="#F00" Height="300" Width="300" X="50" Y="50">
-                    <Text FontSize="42" Value="Start here"></Text>
-</Rectangle>
-            <Rectangle Color="#F0F" Height="300" Width="300" X="200" Y="200"></Rectangle>
-            <Rectangle Color="#0F0"></Rectangle>
+            <InteractiveTransform Translation="{func3351}" ZoomFactor="{func1301}"></InteractiveTransform>
+            <Each Items="{func3831}">
+                    <Text Color="{color}" FontSize="{fontSize}" Value="{text}" X="{x}" Y="{y}"></Text>
+</Each>
+            <Each Items="{func3821}">
+                    <Rectangle Color="{color}" Height="{height}" Width="{width}" X="{x}" Y="{y}"></Rectangle>
+</Each>
 </Panel>
 </App>

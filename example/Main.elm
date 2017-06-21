@@ -45,11 +45,10 @@ Timer.create(function() {
 }, 16, true);
 
 
-var socket = new WebSocket('ws://0046ffee.ngrok.io');
+var socket = new WebSocket('ws://cca26b37.ngrok.io');
 
 try {
     socket.addEventListener('message', function (event) {
-        console.log('Message from server', event.data);
         elm.ports.listen.send(event.data);
     });
 } catch (e) {
@@ -113,51 +112,38 @@ textReflector json =
             value <| Xml.string "failed to load code"
 
 
+oneRect : Rect -> FuseTag
+oneRect rect =
+    rectangle
+        [ attribute "X" <| Xml.string "{x}"
+        , attribute "Y" <| Xml.string "{y}"
+        , attribute "Width" <| Xml.string "{width}"
+        , attribute "Height" <| Xml.string "{height}"
+        , attribute "Color" <| Xml.string "{color}"
+        ]
+        []
+
+
+oneText : TextBlob -> FuseTag
+oneText blob =
+    Fuse.Controls.text
+        [ attribute "FontSize" <| Xml.string "{fontSize}"
+        , attribute "Value" <| Xml.string "{text}"
+        , attribute "X" <| Xml.string "{x}"
+        , attribute "Y" <| Xml.string "{y}"
+        , attribute "Color" <| Xml.string "{color}"
+        ]
+        []
+
+
 main : Platform.Program Never Model Msg
 main =
     Fuse.app
         [ panel
             [ onClick StartMoving, transformOrigin "TopLeft" ]
             [ interactiveTransform [ reflect translationReflector modelToTranslation, reflect zoomReflector modelToZoom ] []
-            , rectangle [ color "#F00", x -500, width 300, height 200 ]
-                [ textInput
-                    [ stringValueChanged (TextChanged)
-                    , width 300
-                    , height 200
-                    ]
-                    []
-                ]
-            , Fuse.Controls.text
-                [ x 600
-                , y 600
-                , fontSize 42
-                , reflect textReflector (\model -> Json.Encode.string model.text)
-                ]
-                []
-            , rectangle
-                [ color "#F00"
-                , x 50
-                , y 50
-                , height 300
-                , width 300
-                ]
-                [ Fuse.Controls.text
-                    [ fontSize 42
-                    , value <| Xml.string "Start here"
-                    ]
-                    []
-                ]
-            , rectangle
-                [ color "#F0F"
-                , x 200
-                , y 200
-                , height 300
-                , width 300
-                ]
-                []
-            , rectangle
-                [ color "#0F0" ]
-                []
+            , secondEach (\modeler -> modeler.texts) oneText
+            , each (\model -> model.rects) oneRect
             ]
         ]
         |> Fuse.Generator.run
@@ -171,6 +157,14 @@ main =
             , inMiddlePoint = False
             , text = "Sample"
             , isPaused = False
+            , rects =
+                [ Rect 50 50 "#000" 300 300
+                , Rect 200 200 "#F0F" 300 300
+                , Rect 0 0 "#0F0" 1000 1000
+                ]
+            , texts =
+                [ TextBlob 50 50 "Start here" "#00F" 42
+                ]
             }
             subscriptions
             timer

@@ -91,6 +91,7 @@ javaScript : String -> FuseTag
 javaScript content =
     node "JavaScript" [] [ Xml.string content ]
 
+
 namedJavaScript : String -> String -> FuseTag
 namedJavaScript name content =
     node "JavaScript" [ Attribute "Name" <| Xml.string name ] [ Xml.string content ]
@@ -327,7 +328,6 @@ exports sendNames subs =
         exportNames =
             ("elm" :: subNames ++ sendNames)
                 |> List.map (\name -> name ++ ":" ++ name)
-
                 |> String.join ","
     in
         "module.exports = {" ++ exportNames ++ "}"
@@ -345,14 +345,26 @@ var elm = Elm.Main.worker();
 subsText : String
 subsText =
     """
+
+var lastModel = null;
 elm.ports.modelUpdated.subscribe(function(things){
     var model = things[0];
     var nameToFn = things[1];
 
+    if (model === lastModel) return;
+    lastModel = model;
+
     nameToFn.map(function(thing){
         var name = thing._0;
         var func = thing._1;
-        module.exports[name].value = func(model);
+        var newValue = func(model);
+
+        if (typeof newValue === "object" && Object.keys(newValue).indexOf('_items') > -1){
+            module.exports[name].clear();
+            module.exports[name].addAll(newValue['_items']);
+        } else {
+            module.exports[name].value = newValue;
+        }
     });
 });
 """
@@ -432,13 +444,45 @@ reflectString attributeMake view =
     reflect (FFI.intoElm >> attributeMake) (view >> Json.string)
 
 
+items : Json.Value -> Attribute msg model
+items thing =
+    Attribute "Items" <| Xml.jsonToXml thing
+
+
+each : (model -> List thing) -> (thing -> FuseTag) -> FuseTag
+each reflector view =
+    node "Each"
+        [ reflect items (reflector >> List.map FFI.asIs >> Json.list >> (\x -> Json.object [ ( "_items", x ) ])) ]
+        [ view (FFI.intoElm <| FFI.asIs "") ]
+
+
+secondEach : (model -> List thing) -> (thing -> FuseTag) -> FuseTag
+secondEach reflection view =
+    node "Each"
+        [ reflect items (reflection >> List.map FFI.asIs >> Json.list >> (\x -> Json.object [ ( "_items", x ) ])) ]
+        [ view (FFI.intoElm <| FFI.asIs "") ]
+
+
 
 -- TODO: this only works if functions aren't the same length
 
 
 functionToString : (a -> b) -> String
 functionToString fn =
-    FFI.sync "return 'func' + _0.toString().length.toString();" [ FFI.asIs fn ]
+    FFI.sync """
+    if (typeof window === "undefined") {
+        if (typeof global === "undefined") var global = {};
+        var window = global;
+        window.mapper = {};
+    }
+    if (typeof window.counter === 'undefined') { window.counter = 0 }
+    window.counter++;
+
+    if (typeof window.mapper[_0.toString()] === "undefined")
+        window.mapper[_0.toString()] = 'func' + _0.toString().length.toString() + window.counter;
+
+    return window.mapper[_0.toString()];
+    """ [ FFI.asIs fn ]
         |> FFI.intoElm
 
 

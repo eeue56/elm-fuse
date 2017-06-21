@@ -1,10 +1,44 @@
- pause
- [Viewport 1000, -550, -550, 1]
-[Viewport 500, -50, -50, 2]
- [Viewport 500, 500, 0, 0.5]
-[Viewport 500, 0, 0, 0.5]
-
-[Viewport 500, 0, 0, 1]
-[Viewport 1000, 0, 0, 0.5]
 [Viewport 1000, 0, 0, 1]
- [Viewport 1000, 0, 0, 2]
+
+-- welcome everyone
+[TextBlob 125, 150, "Hello!", "#00F", 60]
+[Rect 50, 50, "#000", 300, 300]
+[Viewport 1000, -60, -100, 5]
+
+-- this is fuse
+[TextBlob 120, 425, "This is\n Fuse!", "#00F", 60]
+[Rect 50, 300, "#000", 50, 300]
+[Rect 300, 300, "#000", 50, 300]
+[Rect 50, 300, "#FFF", 300, 300]
+[Viewport 1000, -60, -400, 5]
+
+-- but it's also elm
+[TextBlob 500, 250, "This is\n also Elm!", "#FFF", 60]
+[Viewport 1000, -450, -180, 3]
+
+[Rect 500, 500, "#F0E", 50, 50]
+[Rect 550, 500, "#F0E", 50, 50]
+[Rect 600, 500, "#F0E", 50, 50]
+[Rect 500, 550, "#F0E", 50, 50]
+[Rect 550, 550, "#F0E", 50, 50]
+[Rect 600, 550, "#F0E", 50, 50]
+
+[Rect 550, 600, "#F0E", 50, 50]
+
+[Rect 450, 650, "#F0E", 50, 50]
+[Rect 500, 650, "#F0E", 50, 50]
+[Rect 550, 650, "#F0E", 50, 50]
+[Rect 600, 650, "#F0E", 50, 50]
+[Rect 650, 650, "#F0E", 50, 50]
+
+[Rect 500, 700, "#F0E", 50, 50]
+[Rect 550, 700, "#F0E", 50, 50]
+[Rect 600, 700, "#F0E", 50, 50]
+
+[Viewport 1000, -350, -475, 3]
+
+
+
+[Rect 0, 0, "#0F0", 2000, 1000]
+
+[Viewport 1000, 0, 0, 1]

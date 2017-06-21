@@ -11,6 +11,24 @@ type alias Viewport =
     }
 
 
+type alias Rect =
+    { x : Float
+    , y : Float
+    , color : String
+    , width : Float
+    , height : Float
+    }
+
+
+type alias TextBlob =
+    { x : Float
+    , y : Float
+    , text : String
+    , color : String
+    , fontSize : Float
+    }
+
+
 type alias Model =
     { translations : Zipper Viewport
     , currentViewport : Viewport
@@ -21,4 +39,6 @@ type alias Model =
     , inMiddlePoint : Bool
     , text : String
     , isPaused : Bool
+    , rects : List Rect
+    , texts : List TextBlob
     }

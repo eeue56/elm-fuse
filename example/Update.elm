@@ -81,11 +81,25 @@ isPastCurrent model =
     model.timeInMilliseconds > (Zipper.current model.translations |> .animationLength)
 
 
+type RectField
+    = FloatField Float
+    | StringField String
+
+
+decodeRectFields : Json.Decoder RectField
+decodeRectFields =
+    Json.oneOf
+        [ Json.map FloatField Json.float
+        , Json.map StringField Json.string
+        ]
+
+
 loadViewports : String -> Model -> Model
 loadViewports viewports model =
     { model
         | translations =
             String.split "\n" viewports
+                |> List.filter (String.startsWith "[Viewport")
                 |> List.map (\line -> String.split " " line |> List.drop 1 |> String.join " " |> (\x -> "[" ++ x))
                 |> List.filterMap (\line -> Json.decodeString (Json.list Json.float) line |> Result.toMaybe)
                 |> List.filterMap
@@ -100,6 +114,34 @@ loadViewports viewports model =
                 |> Zipper.fromList
                 |> Zipper.withDefault (Zipper.current model.translations)
         , isPaused = String.startsWith "pause" viewports
+        , rects =
+            String.split "\n" viewports
+                |> List.filter (String.startsWith "[Rect")
+                |> List.map (\line -> String.split " " line |> List.drop 1 |> String.join " " |> (\x -> "[" ++ x))
+                |> List.filterMap (\line -> Json.decodeString (Json.list decodeRectFields) line |> Result.toMaybe)
+                |> List.filterMap
+                    (\x ->
+                        case x of
+                            [ FloatField x, FloatField y, StringField z, FloatField d, FloatField n ] ->
+                                Rect x y z d n |> Just
+
+                            _ ->
+                                Nothing
+                    )
+        , texts =
+            String.split "\n" viewports
+                |> List.filter (String.startsWith "[Text")
+                |> List.map (\line -> String.split " " line |> List.drop 1 |> String.join " " |> (\x -> "[" ++ x))
+                |> List.filterMap (\line -> Json.decodeString (Json.list decodeRectFields) line |> Result.toMaybe)
+                |> List.filterMap
+                    (\x ->
+                        case x of
+                            [ FloatField x, FloatField y, StringField z, StringField d, FloatField n ] ->
+                                TextBlob x y z d n |> Just
+
+                            _ ->
+                                Nothing
+                    )
     }
 
 
