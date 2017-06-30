@@ -60,14 +60,14 @@ try {
 
 translations : Zipper Viewport
 translations =
-    [ Viewport 1000 0 0 1
-    , Viewport 1000 -50 -50 6
-    , Viewport 1000 50 0 1
-    , Viewport 1000 45 -50 1.5
-    , Viewport 1000 0 0 1
+    [ Viewport 1000 0 0 1 False
+    , Viewport 1000 -50 -50 6 False
+    , Viewport 1000 50 0 1 False
+    , Viewport 1000 45 -50 1.5 False
+    , Viewport 1000 0 0 1 False
     ]
         |> Zipper.fromList
-        |> Zipper.withDefault (Viewport 1000 0 0 1)
+        |> Zipper.withDefault (Viewport 1000 0 0 1 False)
 
 
 modelToTranslation : Model -> Json.Value
@@ -151,7 +151,7 @@ main =
             { translations = translations
             , isMoving = False
             , currentMovement = ( 0, 0 )
-            , currentViewport = Viewport 1000 0 0 1
+            , currentViewport = Viewport 1000 0 0 1 False
             , timeInMilliseconds = 0
             , currentZoomDiff = 0
             , inMiddlePoint = False

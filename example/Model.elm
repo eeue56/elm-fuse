@@ -8,6 +8,7 @@ type alias Viewport =
     , translationX : Float
     , translationY : Float
     , zoomFactor : Float
+    , autoplayNext : Bool
     }
 
 

@@ -26,9 +26,12 @@ elm.ports.modelUpdated.subscribe(function(things){
         var newValue = func(model);
 
         if (typeof newValue === "object" && Object.keys(newValue).indexOf('_items') > -1){
+            if (module.exports[name].toArray() == newValue['_items']) return;
+
             module.exports[name].clear();
             module.exports[name].addAll(newValue['_items']);
         } else {
+            if (module.exports[name].value == newValue) return;
             module.exports[name].value = newValue;
         }
     });

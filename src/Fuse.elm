@@ -247,6 +247,7 @@ insertEventItem name value eventDict dict =
 
 
 {-|
+
     Replace all reflectors and events
 -}
 replaceSpecial : EveryDict msg String -> String -> Dict String Xml.Value -> Xml.Value -> FuseTag
@@ -360,9 +361,13 @@ elm.ports.modelUpdated.subscribe(function(things){
         var newValue = func(model);
 
         if (typeof newValue === "object" && Object.keys(newValue).indexOf('_items') > -1){
+            if (module.exports[name].toArray() == newValue['_items']) return;
+
+
             module.exports[name].clear();
             module.exports[name].addAll(newValue['_items']);
         } else {
+            if (module.exports[name].value == newValue) return;
             module.exports[name].value = newValue;
         }
     });
@@ -381,6 +386,7 @@ return _0.ctor || "";
 
 
 {-|
+
     >>> argsBlock 1
     "_0"
 
@@ -492,9 +498,7 @@ trueToString a =
         |> FFI.intoElm
 
 
-{-|
-
--}
+{-| -}
 funcToString : (a -> b) -> String
 funcToString fn =
     FFI.sync "return _0.toString();" [ FFI.asIs fn ]

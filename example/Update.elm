@@ -105,8 +105,8 @@ loadViewports viewports model =
                 |> List.filterMap
                     (\x ->
                         case x of
-                            [ x, y, z, d ] ->
-                                Viewport x y z d |> Just
+                            [ x, y, z, d, auto ] ->
+                                Viewport x y z d (auto == 1) |> Just
 
                             _ ->
                                 Nothing
@@ -203,16 +203,30 @@ update msg model =
                                 nextViewport =
                                     Zipper.next model.translations
                                         |> Zipper.withDefault (Zipper.current model.translations)
+
+                                isAutoplay =
+                                    Zipper.current model.translations |> .autoplayNext
                             in
-                                ( { model
-                                    | isMoving = False
-                                    , currentMovement = ( 0, 0 )
-                                    , translations = nextViewport
-                                    , currentViewport = Zipper.current nextViewport
-                                    , timeInMilliseconds = 0
-                                  }
-                                , Cmd.none
-                                )
+                                if isAutoplay then
+                                    ( { model
+                                        | isMoving = True
+                                        , currentMovement = fromCurrentToNext nextViewport
+                                        , translations = nextViewport
+                                        , timeInMilliseconds = 0
+                                        , currentZoomDiff = fromCurrentToNextZoom model.translations
+                                      }
+                                    , Cmd.none
+                                    )
+                                else
+                                    ( { model
+                                        | isMoving = False
+                                        , currentMovement = ( 0, 0 )
+                                        , translations = nextViewport
+                                        , currentViewport = Zipper.current nextViewport
+                                        , timeInMilliseconds = 0
+                                      }
+                                    , Cmd.none
+                                    )
                     else
                         let
                             ( x, y ) =
